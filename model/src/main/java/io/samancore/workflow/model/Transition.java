@@ -10,7 +10,7 @@ public record Transition(
         State stateFrom,
         State stateTo,
         List<String> transitionRoles,
-        Map<String, Objects> data
+        Map<String, Object> data
 ) {
     @Override
     public boolean equals(Object o) {

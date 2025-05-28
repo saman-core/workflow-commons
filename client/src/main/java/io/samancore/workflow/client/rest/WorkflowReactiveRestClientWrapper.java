@@ -1,9 +1,10 @@
 package io.samancore.workflow.client.rest;
 
 import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
-import io.samancore.workflow.client.WorkflowClient;
+import io.samancore.workflow.client.WorkflowReactiveClient;
 import io.samancore.workflow.model.State;
 import io.samancore.workflow.model.Transition;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -13,7 +14,7 @@ import java.net.URI;
 import java.util.List;
 
 @ApplicationScoped
-public class WorkflowRestClientWrapper implements WorkflowClient {
+public class WorkflowReactiveRestClientWrapper implements WorkflowReactiveClient {
 
     @Inject
     Logger log;
@@ -25,43 +26,43 @@ public class WorkflowRestClientWrapper implements WorkflowClient {
     String urlSuffix;
 
     @Override
-    public State getState(String moduleName, String productName, String stateId) {
+    public Uni<State> getState(String moduleName, String productName, String stateId) {
         log.debugf("WorkflowRestClientWrapper.getState %s %s %s;", moduleName, productName, stateId);
         var url = generateUrl(moduleName);
         var conditionTemplateRestClient = QuarkusRestClientBuilder.newBuilder()
                 .baseUri(URI.create(url))
                 .build(WorkflowRestClient.class);
-        return conditionTemplateRestClient.getState(productName, stateId);
+        return conditionTemplateRestClient.getStateReactive(productName, stateId);
     }
 
     @Override
-    public Transition getTransition(String moduleName, String productName, String stateId) {
+    public Uni<Transition> getTransition(String moduleName, String productName, String stateId) {
         log.debugf("WorkflowRestClientWrapper.getTransition %s %s %s;", moduleName, productName, stateId);
         var url = generateUrl(moduleName);
         var conditionTemplateRestClient = QuarkusRestClientBuilder.newBuilder()
                 .baseUri(URI.create(url))
                 .build(WorkflowRestClient.class);
-        return conditionTemplateRestClient.getTransition(productName, stateId);
+        return conditionTemplateRestClient.getTransitionReactive(productName, stateId);
     }
 
     @Override
-    public List<Transition> getTransitionsByState(String moduleName, String productName, String stateId) {
+    public Uni<List<Transition>> getTransitionsByState(String moduleName, String productName, String stateId) {
         log.debugf("WorkflowRestClientWrapper.getTransitionsByState %s %s %s;", moduleName, productName, stateId);
         var url = generateUrl(moduleName);
         var conditionTemplateRestClient = QuarkusRestClientBuilder.newBuilder()
                 .baseUri(URI.create(url))
                 .build(WorkflowRestClient.class);
-        return conditionTemplateRestClient.getTransitionsByState(productName, stateId);
+        return conditionTemplateRestClient.getTransitionsByStateReactive(productName, stateId);
     }
 
     @Override
-    public List<Transition> getInitialTransitions(String moduleName, String productName) {
+    public Uni<List<Transition>> getInitialTransitions(String moduleName, String productName) {
         log.debugf("WorkflowRestClientWrapper.getInitialTransitions %s %s;", moduleName, productName);
         var url = generateUrl(moduleName);
         var conditionTemplateRestClient = QuarkusRestClientBuilder.newBuilder()
                 .baseUri(URI.create(url))
                 .build(WorkflowRestClient.class);
-        return conditionTemplateRestClient.getInitialTransitions(productName);
+        return conditionTemplateRestClient.getInitialTransitionsReactive(productName);
     }
 
     private String generateUrl(String moduleName) {
